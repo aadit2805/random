@@ -74,9 +74,19 @@ log() {
 
 notify() {
     if [ "$ENABLE_NOTIFICATIONS" = true ]; then
-        osascript -e "display notification \"$1\" with title \"Resume Sync\""
+        # Uses terminal-notifier to bypass Do Not Disturb
+        # Install with: brew install terminal-notifier
+        if command -v terminal-notifier &> /dev/null; then
+            terminal-notifier -title "Resume Sync" -message "$1" -ignoreDnD -sound default
+        else
+            # Fallback to osascript if terminal-notifier not installed
+            osascript -e "display notification \"$1\" with title \"Resume Sync\""
+        fi
     fi
 }
+
+notify "Resume change detected..."
+log "Script triggered"
 
 # Check if source file exists
 if [ ! -f "$SOURCE_FILE" ]; then
